@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DatabaseToolDbSqlDialect">
+    <option name="dialects">
+      <map>
+        <entry key="$PROJECT_DIR$/internal/storage/migrations/20230819163923_create_sources.sql" value="PostgreSQL" />
+        <entry key="$PROJECT_DIR$/internal/storage/migrations/20230819164106_create_articles.sql" value="PostgreSQL" />
+      </map>
+    </option>
+  </component>
+</project>
