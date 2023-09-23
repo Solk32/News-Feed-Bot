@@ -32,8 +32,6 @@ func (s *SourcePostgresStorage) Sources(ctx context.Context) ([]model.Source, er
 	return lo.Map(sources, func(source dbSource, _ int) model.Source { return model.Source(source) }), nil
 }
 
-///////////////////////////////
-
 func (s *SourcePostgresStorage) SourceByID(ctx context.Context, id int64) (*model.Source, error) {
 	conn, err := s.db.Connx(ctx)
 	if err != nil
