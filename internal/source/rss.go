@@ -2,10 +2,12 @@ package source
 
 import (
 	"context"
+	"strings"
+
 	"github.com/SlyMarbo/rss"
 	"github.com/samber/lo"
-	"news_feed_bot/internal/model"
-	"strings"
+
+	"github.com/defer-panic/news-feed-bot/internal/model"
 )
 
 type RSSSource struct {
@@ -28,7 +30,7 @@ func (s RSSSource) Fetch(ctx context.Context) ([]model.Item, error) {
 		return nil, err
 	}
 
-	return lo.Map(feed.Items, func(item *rss.Item, _ int) model.Item) {
+	return lo.Map(feed.Items, func(item *rss.Item, _ int) model.Item {
 		return model.Item{
 			Title:      item.Title,
 			Categories: item.Categories,
@@ -72,5 +74,3 @@ func (s RSSSource) loadFeed(ctx context.Context, url string) (*rss.Feed, error) 
 		return feed, nil
 	}
 }
-
-///

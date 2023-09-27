@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/news_feed_bot.iml" filepath="$PROJECT_DIR$/.idea/news_feed_bot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/News-Feed-Bot.iml" filepath="$PROJECT_DIR$/.idea/News-Feed-Bot.iml" />
     </modules>
   </component>
 </project>

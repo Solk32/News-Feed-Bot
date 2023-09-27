@@ -2,10 +2,12 @@ package storage
 
 import (
 	"context"
+	"time"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/samber/lo"
-	"news_feed_bot/internal/model"
-	"time"
+
+	"github.com/defer-panic/news-feed-bot/internal/model"
 )
 
 type SourcePostgresStorage struct {
@@ -42,6 +44,7 @@ func (s *SourcePostgresStorage) SourceByID(ctx context.Context, id int64) (*mode
 	if err := conn.GetContext(ctx, &source, `SELECT * FROM sources WHERE id = $1`, id); err != nil {
 		return nil, err
 	}
+
 	return (*model.Source)(&source), nil
 }
 
@@ -54,10 +57,10 @@ func (s *SourcePostgresStorage) Add(ctx context.Context, source model.Source) (i
 
 	var id int64
 
-	row := conn.QueryRowContext(
+	row := conn.QueryRowxContext(
 		ctx,
-		`INSERT INTO sources (name, feed_url, priority) 
-								VALUES ($1,$2,$3) RETURNING id;`,
+		`INSERT INTO sources (name, feed_url, priority)
+					VALUES ($1, $2, $3) RETURNING id;`,
 		source.Name, source.FeedURL, source.Priority,
 	)
 
@@ -94,6 +97,7 @@ func (s *SourcePostgresStorage) Delete(ctx context.Context, id int64) error {
 	if _, err := conn.ExecContext(ctx, `DELETE FROM sources WHERE id = $1`, id); err != nil {
 		return err
 	}
+
 	return nil
 }
 

@@ -13,16 +13,17 @@ import (
 	src "github.com/defer-panic/news-feed-bot/internal/source"
 )
 
-///go:generate moq --out=mocks/mock_article_storage.go --pkg=mocks . ArcticleStorage
+//go:generate moq --out=mocks/mock_article_storage.go --pkg=mocks . ArticleStorage
 type ArticleStorage interface {
-	Store(ctx context.Context) ([]model.Source, error)
+	Store(ctx context.Context, article model.Article) error
 }
 
-///go:generate moq --out=mocks/mock_source.go --pkg=mocks . Source
+//go:generate moq --out=mocks/mock_sources_provider.go --pkg=mocks . SourcesProvider
 type SourcesProvider interface {
-	Store(ctx context.Context) ([]model.Source, error)
+	Sources(ctx context.Context) ([]model.Source, error)
 }
 
+//go:generate moq --out=mocks/mock_source.go --pkg=mocks . Source
 type Source interface {
 	ID() int64
 	Name() string
@@ -30,8 +31,9 @@ type Source interface {
 }
 
 type Fetcher struct {
-	articles       ArticleStorage
-	sources        SourcesProvider
+	articles ArticleStorage
+	sources  SourcesProvider
+
 	fetchInterval  time.Duration
 	filterKeywords []string
 }
@@ -57,6 +59,7 @@ func (f *Fetcher) Start(ctx context.Context) error {
 	if err := f.Fetch(ctx); err != nil {
 		return err
 	}
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -84,7 +87,7 @@ func (f *Fetcher) Fetch(ctx context.Context) error {
 			defer wg.Done()
 
 			items, err := source.Fetch(ctx)
-			if err := nil {
+			if err != nil {
 				log.Printf("[ERROR] failed to fetch items from source %q: %v", source.Name(), err)
 				return
 			}
@@ -95,6 +98,7 @@ func (f *Fetcher) Fetch(ctx context.Context) error {
 			}
 		}(src.NewRSSSourceFromModel(source))
 	}
+
 	wg.Wait()
 
 	return nil
@@ -104,7 +108,7 @@ func (f *Fetcher) processItems(ctx context.Context, source Source, items []model
 	for _, item := range items {
 		item.Date = item.Date.UTC()
 
-		if f.itemShouldSkipped(item) {
+		if f.itemShouldBeSkipped(item) {
 			log.Printf("[INFO] item %q (%s) from source %q should be skipped", item.Title, item.Link, source.Name())
 			continue
 		}
@@ -119,10 +123,11 @@ func (f *Fetcher) processItems(ctx context.Context, source Source, items []model
 			return err
 		}
 	}
+
 	return nil
 }
 
-func (f *Fetcher) itemShouldSkipped(item model.Item) bool {
+func (f *Fetcher) itemShouldBeSkipped(item model.Item) bool {
 	categoriesSet := set.New(item.Categories...)
 
 	for _, keyword := range f.filterKeywords {
@@ -130,5 +135,6 @@ func (f *Fetcher) itemShouldSkipped(item model.Item) bool {
 			return true
 		}
 	}
+
 	return false
 }

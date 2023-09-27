@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Item struct {
 	Title      string
@@ -12,10 +14,11 @@ type Item struct {
 }
 
 type Source struct {
-	ID       int64
-	Name     string
-	FeedURL  string
-	CreateAT time.Time
+	ID        int64
+	Name      string
+	FeedURL   string
+	Priority  int
+	CreatedAt time.Time
 }
 
 type Article struct {
@@ -26,5 +29,5 @@ type Article struct {
 	Summary     string
 	PublishedAt time.Time
 	PostedAt    time.Time
-	Created     time.Time
+	CreatedAt   time.Time
 }
